@@ -21,7 +21,7 @@ jobs:
       TF_VAR_ssh_key_name: ${{ vars.DO_KEY_NAME }}
     defaults:
       run:
-        working-directory: terraform
+        working-directory: terraform-infra
     steps:
       - name: Check Confirmation Input
         run: |
