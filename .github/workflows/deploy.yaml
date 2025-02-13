@@ -39,7 +39,7 @@ jobs:
         run: terraform output -raw instance_ip_addr
 
       - name: Terraform Output
-        run: "echo Remote server ip: ${{ steps.terraform-output.outputs.CEPH_SG_ID }}"
+        run: "echo Remote server ip: ${{ steps.terraform-output.outputs.stdout }}"
 
       # - name: Configure server
       #   uses: dawidd6/action-ansible-playbook@v2.8.0
