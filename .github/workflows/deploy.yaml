@@ -38,37 +38,39 @@ jobs:
         id: terraform-output
         run: terraform output -raw instance_ip_addr
 
-      - name: Terraform Output
-        run: "echo Remote server ip: ${{ steps.terraform-output.outputs.stdout }}"
+      - name: Configure server
+        uses: dawidd6/action-ansible-playbook@v2.8.0
+        with:
+          playbook: setup.yaml
+          directory: ansible
+          key: ${{ secrets.SSH_PRIV_KEY }}
+          options: |
+            --inventory inventory_digitalocean.yaml
 
-      # - name: Configure server
-      #   uses: dawidd6/action-ansible-playbook@v2.8.0
-      #   with:
-      #     playbook: setup.yaml
-      #     directory: ansible
-      #     key: ${{ secrets.SSH_PRIV_KEY }}
-      #     options: |
-      #       --inventory inventory_digitalocean.yaml
+      - name: Login to DigitalOcean Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.digitalocean.com
+          username: ${{ vars.DIGITALOCEAN_USERNAME }}
+          password: ${{ secrets.DIGITALOCEAN_API_TOKEN }}
 
-      # - name: Login to DigitalOcean Container Registry
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: registry.digitalocean.com
-      #     username: ${{ vars.DIGITALOCEAN_USERNAME }}
-      #     password: ${{ secrets.DIGITALOCEAN_API_TOKEN }}
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v6.13.0
+        with:
+          context: "hello-world-app"
+          push: true
+          tags: "registry.digitalocean.com/roadmapsh/hello-world-app"
 
-      # - name: Build and push Docker images
-      #   uses: docker/build-push-action@v6.13.0
-      #   with:
-      #     context: "hello-world-app"
-      #     push: true
-      #     tags: "registry.digitalocean.com/roadmapsh/hello-world-app"
-
-      # - name: Run the container on remote host
-      #   uses: appleboy/ssh-action@v1.2.0
-      #   with:
-      #     host: ${{ secrets.HOST }}
-      #     username: linuxserver.io
-      #     password: ${{ secrets.PASSWORD }}
-      #     port: ${{ secrets.PORT }}
-      #     script: whoami
+      - name: Run the container on remote host
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ steps.terraform-output.outputs.stdout }}
+          username: root
+          key: ${{ secrets.SSH_PRIV_KEY }}
+          script: |
+            docker login --username ${{ vars.DIGITALOCEAN_USERNAME }} --password ${{ secrets.DIGITALOCEAN_API_TOKEN }}
+            docker run -d -p 80:80 \
+              -e SECRET_MESSAGE=${{ secrets.SECRET_MESSAGE }} \
+              -e USERNAME=${{ vars.USERNAME }} \
+              -e PASSWORD=${{ secrets.PASSWORD }} \
+              registry.digitalocean.com/roadmapsh/hello-world-app
