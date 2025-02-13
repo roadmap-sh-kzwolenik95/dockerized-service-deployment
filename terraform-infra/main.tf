@@ -36,3 +36,8 @@ resource "digitalocean_droplet" "web" {
   ]
   tags = ["roadmapsh-web"]
 }
+
+resource "digitalocean_container_registry" "container_registry" {
+  name                   = "roadmapsh"
+  subscription_tier_slug = "starter"
+}
