@@ -1,0 +1,21 @@
+plugin: community.digitalocean.digitalocean
+oauth_token: "{{ lookup('env', 'DIGITALOCEAN_TOKEN') }}"
+attributes:
+  - id
+  - name
+  - memory
+  - vcpus
+  - disk
+  - size
+  - image
+  - networks
+  - volume_ids
+  - tags
+  - region
+compose:
+  ansible_host: do_networks.v4 | selectattr('type','eq','public') | map(attribute='ip_address') | first
+  class: do_size.description | lower
+  distro: do_image.distribution | lower
+filters:
+  - 'do_region.slug == "fra1"'
+  - '"roadmapsh-web" in do_tags'
