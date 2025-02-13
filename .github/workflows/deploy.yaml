@@ -55,4 +55,4 @@ jobs:
         with:
           context: "hello-world-app"
           push: true
-          tags: "hello-world-applatest"
+          tags: "registry.digitalocean.com/roadmapsh/hello-world-app"
