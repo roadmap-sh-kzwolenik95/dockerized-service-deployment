@@ -74,8 +74,4 @@ jobs:
           key: ${{ secrets.SSH_PRIV_KEY }}
           script: |
             docker login --username ${{ vars.DIGITALOCEAN_USERNAME }} --password ${{ secrets.DIGITALOCEAN_API_TOKEN }} registry.digitalocean.com
-            docker run -d -p 80:80 \
-              -e SECRET_MESSAGE=${{ secrets.SECRET_MESSAGE }} \
-              -e USERNAME=${{ vars.USERNAME }} \
-              -e PASSWORD=${{ secrets.PASSWORD }} \
-              registry.digitalocean.com/roadmapsh/hello-world-app
+            docker run -d -p 80:80 -e SECRET_MESSAGE=${{ secrets.SECRET_MESSAGE }} -e USERNAME=${{ vars.USERNAME }} -e PASSWORD=${{ secrets.PASSWORD }} registry.digitalocean.com/roadmapsh/hello-world-app
