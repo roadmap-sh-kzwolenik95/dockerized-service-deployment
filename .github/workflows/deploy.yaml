@@ -60,6 +60,8 @@ jobs:
           context: "hello-world-app"
           push: true
           tags: "registry.digitalocean.com/roadmapsh/hello-world-app"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Run the container on remote host
         uses: appleboy/ssh-action@v1.2.0
@@ -68,7 +70,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIV_KEY }}
           script: |
-            docker login --username ${{ vars.DIGITALOCEAN_USERNAME }} --password ${{ secrets.DIGITALOCEAN_API_TOKEN }}
+            docker login --username ${{ vars.DIGITALOCEAN_USERNAME }} --password ${{ secrets.DIGITALOCEAN_API_TOKEN }} registry.digitalocean.com
             docker run -d -p 80:80 \
               -e SECRET_MESSAGE=${{ secrets.SECRET_MESSAGE }} \
               -e USERNAME=${{ vars.USERNAME }} \
