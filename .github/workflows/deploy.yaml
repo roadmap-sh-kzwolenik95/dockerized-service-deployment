@@ -40,6 +40,8 @@ jobs:
 
       - name: Configure server
         uses: dawidd6/action-ansible-playbook@v2.8.0
+        env:
+          ANSIBLE_TIMEOUT: 60
         with:
           playbook: setup.yaml
           directory: ansible
@@ -78,7 +80,7 @@ jobs:
             docker rm hello-world-app-container || true
             docker run --detach --pull=always \
               --name hello-world-app-container \
-              --expose 80:80 \
+              --publish 80:80 \
               -e "SECRET_MESSAGE=${{ secrets.SECRET_MESSAGE }}" \
               -e "USERNAME=${{ vars.USERNAME }}" \
               -e "PASSWORD=${{ secrets.PASSWORD }}" \
